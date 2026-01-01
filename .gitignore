@@ -106,3 +106,8 @@ temp/
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# Data directories
+data/
+*.json
+!package*.json

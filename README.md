@@ -102,18 +102,27 @@ The NPC is named **Horkin**, a gruff but kind village man who:
 
 ## Conversation Management
 
-The system automatically manages conversation history to optimize performance:
+The system automatically manages conversation history with persistent storage:
 
+- **Persistent Storage**: Conversations are saved to `data/conversations.json` and persist between server restarts
 - **Memory Limit**: Stores up to 10 recent messages plus conversation summaries
 - **Automatic Summarization**: When conversation exceeds 10 messages, older messages are summarized
 - **Context Preservation**: Summaries maintain key context for coherent long conversations
 - **History Reset**: Use `POST /api/npc/reset` to clear all conversation history
+- **Conversation Stats**: Use `GET /api/npc/stats` to get conversation statistics
+- **Export Data**: Use `GET /api/npc/export` to export conversation data
 
 **How it works:**
-1. Each message is stored in conversation history
+1. Each message is stored in persistent JSON file (`data/conversations.json`)
 2. When history exceeds 10 messages, the system summarizes the first 5+ messages
 3. The summary replaces individual messages, keeping the last 5 messages intact
 4. This maintains context while managing memory usage
+5. Data directory is excluded from Git to keep conversation data private
+
+**API Endpoints for Conversation Management:**
+- `POST /api/npc/reset` - Reset conversation history
+- `GET /api/npc/stats` - Get conversation statistics
+- `GET /api/npc/export` - Export conversation data
 
 ## Troubleshooting
 

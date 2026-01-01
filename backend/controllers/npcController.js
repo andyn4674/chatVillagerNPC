@@ -1,9 +1,11 @@
 const OllamaService = require('../service/ollamaService');
+const ConversationStorage = require('../../data/conversation');
 
 class NPCController {
   constructor() {
     this.ollamaService = new OllamaService();
-    this.conversationHistory = [];
+    this.conversationStorage = new ConversationStorage();
+    this.conversationHistory = this.conversationStorage.getCurrentConversation();
   }
 
   async initialize() {
@@ -40,12 +42,9 @@ class NPCController {
         this.conversationHistory.slice(0, -1) // Pass previous conversation history
       );
 
-      // Update conversation history
-      this.conversationHistory.push({
-        user: message,
-        npc: response,
-        timestamp: new Date().toISOString()
-      });
+      // Update conversation history in persistent storage
+      this.conversationStorage.addMessage(message, response);
+      this.conversationHistory = this.conversationStorage.getCurrentConversation();
 
       // Check if we need to summarize the conversation
       if (this.conversationHistory.length > 10) {
@@ -85,22 +84,18 @@ class NPCController {
         []
       );
 
-      // Replace the old messages with a summary
-      this.conversationHistory = [
-        {
-          type: 'summary',
-          content: summary,
-          timestamp: new Date().toISOString()
-        },
-        ...recentMessages
-      ];
+      // Use persistent storage to replace with summary
+      this.conversationStorage.replaceWithSummary(summary, recentMessages);
+      this.conversationHistory = this.conversationStorage.getCurrentConversation();
 
       console.log('Conversation summarized. History length:', this.conversationHistory.length);
 
     } catch (error) {
       console.error('Error summarizing conversation:', error);
-      // If summarization fails, just truncate to last 10 messages
-      this.conversationHistory = this.conversationHistory.slice(-10);
+      // If summarization fails, just truncate to last 10 messages in storage
+      const truncatedHistory = this.conversationHistory.slice(-10);
+      this.conversationStorage.setCurrentConversation(truncatedHistory);
+      this.conversationHistory = truncatedHistory;
     }
   }
 
@@ -139,7 +134,10 @@ class NPCController {
 
   async resetConversation(req, res) {
     try {
-      this.conversationHistory = [];
+      // Reset conversation in persistent storage
+      this.conversationStorage.resetConversation();
+      this.conversationHistory = this.conversationStorage.getCurrentConversation();
+      
       res.json({
         message: 'Conversation history reset successfully'
       });
@@ -147,6 +145,30 @@ class NPCController {
       console.error('Error resetting conversation:', error);
       res.status(500).json({
         error: 'Failed to reset conversation'
+      });
+    }
+  }
+
+  async getConversationStats(req, res) {
+    try {
+      const stats = this.conversationStorage.getStatistics();
+      res.json(stats);
+    } catch (error) {
+      console.error('Error getting conversation stats:', error);
+      res.status(500).json({
+        error: 'Failed to get conversation statistics'
+      });
+    }
+  }
+
+  async exportConversation(req, res) {
+    try {
+      const conversationData = this.conversationStorage.exportConversation();
+      res.json(conversationData);
+    } catch (error) {
+      console.error('Error exporting conversation:', error);
+      res.status(500).json({
+        error: 'Failed to export conversation'
       });
     }
   }

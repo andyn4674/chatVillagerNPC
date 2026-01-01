@@ -25,6 +25,8 @@ async function startServer() {
     app.post('/api/npc/chat', (req, res) => npcController.getResponse(req, res));
     app.get('/api/npc/characteristics', (req, res) => npcController.getCharacteristics(req, res));
     app.post('/api/npc/reset', (req, res) => npcController.resetConversation(req, res));
+    app.get('/api/npc/stats', (req, res) => npcController.getConversationStats(req, res));
+    app.get('/api/npc/export', (req, res) => npcController.exportConversation(req, res));
 
     // Health check endpoint
     app.get('/api/health', (req, res) => {
