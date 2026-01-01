@@ -5,8 +5,11 @@ class OllamaService {
     this.model = process.env.OLLAMA_MODEL || 'llama2';
   }
 
-  async generateResponse(prompt, context = []) {
+  async generateResponse(prompt, context = [], conversationHistory = []) {
     try {
+      // Build the conversation context from history
+      const historyMessages = this.buildConversationContext(conversationHistory);
+      
       const messages = [
         {
           role: 'system',
@@ -21,6 +24,7 @@ IMPORTANT RULES:
 4. Use the context provided to make responses relevant
 5. Keep responses concise and in character`
         },
+        ...historyMessages,
         ...context,
         {
           role: 'user',
@@ -39,6 +43,32 @@ IMPORTANT RULES:
       console.error('Error generating response from Ollama:', error);
       throw new Error('Failed to generate response from AI model');
     }
+  }
+
+  buildConversationContext(conversationHistory) {
+    const messages = [];
+    
+    conversationHistory.forEach(message => {
+      if (message.type === 'summary') {
+        // Add summary as system message to provide context
+        messages.push({
+          role: 'system',
+          content: `Conversation Summary: ${message.content}`
+        });
+      } else {
+        // Add user and NPC messages
+        messages.push({
+          role: 'user',
+          content: message.user
+        });
+        messages.push({
+          role: 'assistant',
+          content: message.npc
+        });
+      }
+    });
+    
+    return messages;
   }
 
   async checkModelAvailability() {

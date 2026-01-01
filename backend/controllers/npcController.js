@@ -36,7 +36,8 @@ class NPCController {
       // Generate response using Ollama
       const response = await this.ollamaService.generateResponse(
         message, 
-        context || []
+        context || [],
+        this.conversationHistory.slice(0, -1) // Pass previous conversation history
       );
 
       // Update conversation history
@@ -46,9 +47,9 @@ class NPCController {
         timestamp: new Date().toISOString()
       });
 
-      // Keep only last 10 messages to manage context
+      // Check if we need to summarize the conversation
       if (this.conversationHistory.length > 10) {
-        this.conversationHistory = this.conversationHistory.slice(-10);
+        await this.summarizeConversation();
       }
 
       res.json({
@@ -63,6 +64,61 @@ class NPCController {
         message: error.message
       });
     }
+  }
+
+  async summarizeConversation() {
+    try {
+      // Get the conversation to summarize (all but the last 5 messages)
+      const messagesToSummarize = this.conversationHistory.slice(0, -5);
+      const recentMessages = this.conversationHistory.slice(-5);
+
+      if (messagesToSummarize.length === 0) {
+        return;
+      }
+
+      // Create a summary prompt
+      const summaryPrompt = this.createSummaryPrompt(messagesToSummarize);
+
+      // Generate summary using Ollama
+      const summary = await this.ollamaService.generateResponse(
+        summaryPrompt,
+        []
+      );
+
+      // Replace the old messages with a summary
+      this.conversationHistory = [
+        {
+          type: 'summary',
+          content: summary,
+          timestamp: new Date().toISOString()
+        },
+        ...recentMessages
+      ];
+
+      console.log('Conversation summarized. History length:', this.conversationHistory.length);
+
+    } catch (error) {
+      console.error('Error summarizing conversation:', error);
+      // If summarization fails, just truncate to last 10 messages
+      this.conversationHistory = this.conversationHistory.slice(-10);
+    }
+  }
+
+  createSummaryPrompt(messages) {
+    let conversationText = "Please provide a concise summary of the following conversation between a player and an NPC. Focus on the key topics discussed, important information shared, and the overall context of their interaction:\n\n";
+    
+    messages.forEach((message, index) => {
+      if (message.type === 'summary') {
+        conversationText += `[Summary ${index + 1}]: ${message.content}\n\n`;
+      } else {
+        conversationText += `Player: ${message.user}\n`;
+        conversationText += `NPC: ${message.npc}\n\n`;
+      }
+    });
+
+    conversationText += "Summary (keep it brief and focused on key points):";
+
+    return conversationText;
   }
 
   async getCharacteristics(req, res) {
