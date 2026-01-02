@@ -1,0 +1,26 @@
+/* Import the medieval theme variables and base styles */
+@import './App.css';
+
+/* Remove default Vite styles and ensure medieval theme takes precedence */
+#root {
+  isolation: isolate;
+}
+
+/* Ensure the medieval theme overrides any default styles */
+* {
+  font-family: 'Cormorant Garamond', serif !important;
+}
+
+/* Remove any default margins or padding that might interfere */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+/* Ensure the app takes full height */
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}

@@ -1,0 +1,236 @@
+/* Medieval Theme CSS */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Cormorant+Garamond:wght@400;700&family=MedievalSharp&display=swap');
+
+:root {
+  --primary-color: #8B4513; /* Brown */
+  --secondary-color: #5D4037; /* Dark Brown */
+  --accent-color: #D4AF37; /* Gold */
+  --text-color: #2C1810; /* Dark Brown/Black */
+  --bg-color: #F5F5DC; /* Beige */
+  --paper-color: #FFF8DC; /* Old Paper */
+  --border-color: #8B5A2B; /* Saddle Brown */
+  --shadow-color: rgba(0, 0, 0, 0.3);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Cormorant Garamond', serif;
+  background-color: var(--bg-color);
+  background-image: 
+    radial-gradient(circle at 25% 25%, rgba(212, 175, 55, 0.1) 2px, transparent 2px),
+    radial-gradient(circle at 75% 75%, rgba(212, 175, 55, 0.1) 2px, transparent 2px),
+    linear-gradient(45deg, rgba(0,0,0,0.02) 25%, transparent 25%, transparent 50%, rgba(0,0,0,0.02) 50%, rgba(0,0,0,0.02) 75%, transparent 75%, transparent);
+  background-size: 50px 50px, 50px 50px, 20px 20px;
+  color: var(--text-color);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* Medieval Paper Texture Overlay */
+.app::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch"/><feColorMatrix type="matrix" values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 0.5 0"/></filter><rect width="100%" height="100%" filter="url(%23noise)" opacity="0.1"/></svg>');
+  pointer-events: none;
+  z-index: -1;
+}
+
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.castle-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -2;
+  overflow: hidden;
+}
+
+.castle-silhouette {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 40%;
+  background: linear-gradient(to top, 
+    rgba(44, 24, 16, 0.8) 0%, 
+    rgba(44, 24, 16, 0) 100%);
+  clip-path: polygon(0% 100%, 10% 70%, 20% 85%, 30% 60%, 40% 75%, 50% 50%, 60% 70%, 70% 55%, 80% 80%, 90% 65%, 100% 100%);
+  animation: castleMove 20s linear infinite;
+}
+
+.moat {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 10px;
+  background: linear-gradient(90deg, 
+    rgba(212, 175, 55, 0.3), 
+    rgba(139, 69, 19, 0.5), 
+    rgba(212, 175, 55, 0.3));
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  animation: waterFlow 4s ease-in-out infinite;
+}
+
+@keyframes castleMove {
+  0% { transform: translateX(-100px); }
+  100% { transform: translateX(100px); }
+}
+
+@keyframes waterFlow {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.app-container {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: var(--paper-color);
+  box-shadow: 0 15px 40px var(--shadow-color);
+  border: 6px solid var(--border-color);
+  border-radius: 0; /* Square corners for medieval look */
+  position: relative;
+  z-index: 1;
+}
+
+/* Decorative corner elements */
+.app-container::before {
+  content: '';
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  width: 30px;
+  height: 30px;
+  border-top: 4px solid var(--accent-color);
+  border-left: 4px solid var(--accent-color);
+}
+
+.app-container::after {
+  content: '';
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 30px;
+  height: 30px;
+  border-top: 4px solid var(--accent-color);
+  border-right: 4px solid var(--accent-color);
+}
+
+.app-container::before {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: -10px;
+  width: 30px;
+  height: 30px;
+  border-bottom: 4px solid var(--accent-color);
+  border-left: 4px solid var(--accent-color);
+}
+
+.app-container::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  right: -10px;
+  width: 30px;
+  height: 30px;
+  border-bottom: 4px solid var(--accent-color);
+  border-right: 4px solid var(--accent-color);
+}
+
+.app-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 3px solid var(--accent-color);
+}
+
+h1 {
+  font-family: 'Cinzel', serif;
+  font-size: 3rem;
+  color: var(--primary-color);
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  margin-bottom: 0.5rem;
+  text-shadow: 3px 3px 0 var(--bg-color), 6px 6px 0 var(--shadow-color);
+  line-height: 1;
+}
+
+.subtitle {
+  font-family: 'MedievalSharp', cursive;
+  font-size: 1.2rem;
+  color: var(--secondary-color);
+  font-style: italic;
+}
+
+.app-main {
+  flex: 1;
+}
+
+.app-footer {
+  text-align: center;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 2px solid var(--border-color);
+}
+
+.footer-text {
+  font-family: 'Cinzel', serif;
+  font-size: 0.9rem;
+  color: var(--secondary-color);
+  font-style: italic;
+  letter-spacing: 1px;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 14px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-color);
+  border-left: 3px solid var(--primary-color);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--primary-color), var(--secondary-color));
+  border: 2px solid var(--accent-color);
+  border-radius: 0;
+  box-shadow: inset 2px 2px 5px rgba(0,0,0,0.2);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, var(--secondary-color), #3e2723);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .app-container {
+    margin: 1rem;
+    padding: 1.5rem;
+  }
+  
+  h1 {
+    font-size: 2rem;
+  }
+  
+  .subtitle {
+    font-size: 1rem;
+  }
+}

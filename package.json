@@ -7,14 +7,20 @@
     "start": "node backend/server.js",
     "dev": "nodemon backend/server.js"
   },
-  "keywords": ["npc", "ollama", "ai", "chat"],
+  "keywords": [
+    "npc",
+    "ollama",
+    "ai",
+    "chat"
+  ],
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "express": "^4.18.2",
+    "axios": "^1.13.2",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
-    "ollama": "^0.4.6"
+    "express": "^4.18.2",
+    "ollama": "^0.6.3"
   },
   "devDependencies": {
     "nodemon": "^3.0.2"

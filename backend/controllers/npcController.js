@@ -47,7 +47,7 @@ class NPCController {
       this.conversationHistory = this.conversationStorage.getCurrentConversation();
 
       // Check if we need to summarize the conversation
-      if (this.conversationHistory.length > 10) {
+      if (this.conversationHistory.length > 8) {
         await this.summarizeConversation();
       }
 

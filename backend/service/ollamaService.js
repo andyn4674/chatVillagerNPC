@@ -1,8 +1,9 @@
-const ollama = require('ollama');
+const axios = require('axios');
 
 class OllamaService {
   constructor() {
-    this.model = process.env.OLLAMA_MODEL || 'llama2';
+    this.model = process.env.OLLAMA_MODEL || 'mistral:latest';
+    this.ollamaUrl = process.env.OLLAMA_HOST || 'http://localhost:11434';
   }
 
   async generateResponse(prompt, context = [], conversationHistory = []) {
@@ -32,15 +33,23 @@ IMPORTANT RULES:
         }
       ];
 
-      const response = await ollama.chat({
+      const response = await axios.post(`${this.ollamaUrl}/api/chat`, {
         model: this.model,
         messages: messages,
-        stream: false
+        stream: false,
+        options: {
+          num_ctx: 1024,      // Reduce context window for faster processing
+          num_thread: 12,     // Use more CPU threads (adjust based on your CPU)
+          num_gpu: 1,         // Use GPU if available
+          temperature: 0.7,   // Slightly lower temperature for faster responses
+          top_p: 0.9,         // Adjust sampling for speed
+          repeat_penalty: 1.1 // Reduce repetition for more efficient generation
+        }
       });
 
-      return response.message.content;
+      return response.data.message.content;
     } catch (error) {
-      console.error('Error generating response from Ollama:', error);
+      console.error('Error generating response from Ollama:', error.response?.data || error.message);
       throw new Error('Failed to generate response from AI model');
     }
   }
@@ -73,8 +82,8 @@ IMPORTANT RULES:
 
   async checkModelAvailability() {
     try {
-      const response = await ollama.list();
-      const models = response.models;
+      const response = await axios.get(`${this.ollamaUrl}/api/tags`);
+      const models = response.data.models;
       const availableModels = models.map(m => m.name);
       
       if (availableModels.includes(this.model)) {
@@ -84,7 +93,7 @@ IMPORTANT RULES:
         return false;
       }
     } catch (error) {
-      console.error('Error checking model availability:', error);
+      console.error('Error checking model availability:', error.response?.data || error.message);
       return false;
     }
   }
@@ -92,14 +101,15 @@ IMPORTANT RULES:
   async pullModel(modelName) {
     try {
       console.log(`Pulling model: ${modelName}`);
-      const response = await ollama.pull({
-        model: modelName,
+      
+      const response = await axios.post(`${this.ollamaUrl}/api/pull`, {
+        name: modelName
       });
       
-      console.log('Model pulled successfully:', response);
+      console.log('Model pulled successfully:', response.data);
       return true;
     } catch (error) {
-      console.error('Error pulling model:', error);
+      console.error('Error pulling model:', error.response?.data || error.message);
       throw new Error('Failed to pull model from Ollama');
     }
   }
